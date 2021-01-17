@@ -21,7 +21,6 @@ add_executable(FinancialOrganiser
   ui/mystatements.ui
   
   src/main.cpp
-  src/FinancialOrganiser.cpp
   src/mainwindow.cpp
   src/CsvParser.cpp
   src/importstatement.cpp
@@ -30,7 +29,6 @@ add_executable(FinancialOrganiser
   
   src/mainwindow.h
   src/CsvParser.h
-  src/FinancialOrganiser.h
   src/importstatement.h
   src/database.h
   src/mystatements.h

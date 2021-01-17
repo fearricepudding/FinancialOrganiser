@@ -11,20 +11,23 @@ myStatements::myStatements(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    database *db = database::instance();
-    Json::Value statements = db->getState();
-    QListWidget *list = ui->statemenntList;
-    for (auto const& id : statements.getMemberNames()) {
-        std::cout << id << std::endl;
-        list->addItem(QString::fromStdString(id));
-    }
-
     connect(ui->statemenntList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(statementClicked(QListWidgetItem*)));
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &myStatements::selectedSlot);
+
+    updateList();
 }
 
-myStatements::~myStatements()
-{
+void myStatements::updateList(){
+	database *db = database::instance();
+    Json::Value statements = db->getState();
+    QListWidget *list = ui->statemenntList;
+    list->clear();
+    for (auto const& id : statements.getMemberNames()) {
+        list->addItem(QString::fromStdString(id));
+    };
+};
+
+myStatements::~myStatements(){
     delete ui;
 }
 

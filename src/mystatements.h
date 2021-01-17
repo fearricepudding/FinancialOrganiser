@@ -16,6 +16,7 @@ public:
     explicit myStatements(QWidget *parent = nullptr);
     ~myStatements();
     std::string currentStatement = "";
+    void updateList();
 
 private:
     Ui::myStatements *ui;

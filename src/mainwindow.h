@@ -26,6 +26,7 @@ private:
     myStatements myStatementsWindow;
     database* db = database::instance();
     std::string selectedStateament = "tmp";
+    void clearStats();
 
 private slots:
 	void openStatementImporter();

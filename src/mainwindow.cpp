@@ -1,7 +1,6 @@
 #include <iostream>
 #include "mainwindow.h"
 #include "../ui/ui_mainwindow.h"
-#include "FinancialOrganiser.h"
 #include "importstatement.h"
 #include "database.h"
 #include "mystatements.h"
@@ -18,18 +17,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&myStatementsWindow, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
 }
 
 void MainWindow::openStatements(){
+    myStatementsWindow.updateList();
     myStatementsWindow.show();
 }
 
 void MainWindow::changedStatement(std::string name){
     selectedStateament = name;
-    std::cout << name << std::endl;
     updateStatementItems(selectedStateament);
 }
 
@@ -51,21 +49,31 @@ void MainWindow::statementItemClicked(QListWidgetItem *item){
     // Set date
     std::string date = itemsData["Transaction Date"].asString();
     ui->itemDate->setText(QString::fromStdString(date));
+};
+
+void MainWindow::clearStats(){
+    ui->itemName->setText("");
+    ui->itemValue->setText("");
+    ui->itemDate->setText("");
+    ui->balStart->setText("");
+    ui->balEnd->setText("");
+    ui->balDiff->setText("");
+    ui->monthTotal->setText("");
+    ui->monthBalance->setText("");
 }
 
 void MainWindow::updateStatementItems(std::string statementName){
     Json::Value statement = db->getStatement(statementName);
     QListWidget *list = ui->statementItems;
     list->clear();
+    clearStats();
     if(statement.size() <= 0){
-        std::cout << statement.size() << std::endl;
         return;
-    }
+    };
     QLabel *monthTotalLabel = ui->monthTotal;
     QLabel *monthBalanceLabel = ui->monthBalance;
     float monthTotal = 0;
     float monthBalance = 0;
-    //std::cout << statement.size() << std::endl;
     for(int i = 0; i < statement.size(); i++){
         Json::Value item = statement[i];
         // Add item to list
@@ -75,13 +83,13 @@ void MainWindow::updateStatementItems(std::string statementName){
         if(debit.length() > 0){
             monthTotal += std::stof(debit);
             monthBalance -= std::stof(debit);
-        }
+        };
         // Get credits
         std::string credit = item["Credit Amount"].asString();
         if(credit.length() > 0){
             monthBalance += std::stof(credit);
-        }
-    }
+        };
+    };
     std::cout << "Total: " << monthBalance << std::endl;
     // Set total
     QString monthTotalQ = QString::number(monthTotal);
@@ -89,7 +97,6 @@ void MainWindow::updateStatementItems(std::string statementName){
     // Set balance
     QString monthBalanceQ = QString::number(monthBalance);
     monthBalanceLabel->setText("£"+monthBalanceQ);
-
     //set Start & end bal
     std::string startBal = statement[0]["Balance"].asString();
     std::string endBal = statement[statement.size()-1]["Balance"].asString();
@@ -97,9 +104,8 @@ void MainWindow::updateStatementItems(std::string statementName){
     ui->balStart->setText("£"+QString::fromStdString(startBal));
     ui->balEnd->setText("£"+QString::fromStdString(endBal));
     ui->balDiff->setText("£"+QString::number(diff));
-}
+};
 
 void MainWindow::openStatementImporter(){
     newStatement.show();
-}
-
+};
