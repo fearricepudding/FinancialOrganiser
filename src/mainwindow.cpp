@@ -5,6 +5,8 @@
 #include "database.h"
 #include "mystatements.h"
 
+
+
 #include <QTableWidget>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -17,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     //this->layout()->setSizeConstraint(QLayout::SetFixedSize);
     //this->setFixedSize(QSize(770, 619));
     ui->setupUi(this);
-    updateStatementItems(selectedStateament);
+    //updateStatementItems(selectedStateament);
     // Import and open statements
     connect(ui->newStatement, &QPushButton::released, this, &MainWindow::openStatementImporter);
     connect(&myStatementsWindow, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
@@ -30,33 +32,49 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::openStatements(){
+    dbg->out("Opening statements");
     myStatementsWindow.updateList();
     myStatementsWindow.show();
 }
 
 void MainWindow::changedStatement(std::string name){
+    dbg->out("New statement selected: "+name);
     selectedStateament = name;
     updateStatementItems(selectedStateament);
 }
 
+void MainWindow::setTotalsTable(){
+    dbg->out("Setting up totals table");
+    QTableWidget *totalsTable = ui->statementTotals;
+    QStringList titles;
+    titles << "Total" << "Price";
+    totalsTable->setColumnCount(2);
+    totalsTable->setRowCount(8);
+    totalsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    totalsTable->setHorizontalHeaderLabels(titles);
+
+    QTableWidgetItem *cell = new QTableWidgetItem();
+    cell->setText("Total Bills: ");
+    totalsTable->setItem(0, 0, cell);
+}
+
 
 void MainWindow::updateStatementItems(std::string statementName){
+    dbg->out("Updating statement items...");
     Json::Value statement = db->getStatement(statementName);
 
-    QTableWidget *table = ui->statementTable;
+    QTableWidget *statementTable = ui->statementTable;
+    QTableWidget *totalsTable = ui->statementTotals;
 
-    table->setColumnCount(8);
-    table->setRowCount(statement.size());
-    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     QStringList titles;
+    titles << "Reference" << "Ammount";
+    statementTable->setHorizontalHeaderLabels(titles);
+    statementTable->setColumnCount(2);
+    statementTable->setRowCount(statement.size());
+    statementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    for (auto const& id : statement[0].getMemberNames()) {
-        std::cout << id << std::endl;
-        QString tmp = QString::fromStdString(id);
-        titles.append(tmp);std::cout << id << std::endl;
-    }
-
-    table->setHorizontalHeaderLabels(titles);
+    dbg->out("Init totals table...");
+    setTotalsTable();
 
     if(statement.size() <= 0){
         return;
@@ -64,10 +82,34 @@ void MainWindow::updateStatementItems(std::string statementName){
 
     float monthTotal = 0;
     float monthBalance = 0;
-    /*
+    const char *text;
+    QTableWidgetItem *cell = new QTableWidgetItem();
+
+    dbg->out("Looping statement...");
     for(int i = 0; i < statement.size(); i++){
+        dbg->out("Reading item: ");
+        dbg->out(i);
         Json::Value item = statement[i];
         // Add item to list
+        text = item["Transaction Description"].asCString();
+        if(strlen(text) > 0){
+            QTableWidgetItem *cell = new QTableWidgetItem(text);
+            statementTable->setItem(i, 0, cell);
+        };
+
+        cell = new QTableWidgetItem();
+        text = item["Debit Amount"].asCString();
+        cell->setTextColor(Qt::red);
+        if(strlen(text) <= 0){
+            text = item["Credit Amount"].asCString();
+            cell->setTextColor(Qt::green);
+            if(strlen(text) <= 0){
+                text = "err";
+            }
+        };
+        cell->setText(text);
+        statementTable->setItem(i, 1, cell);
+
 
         // Get total spent
         std::string debit = item["Debit Amount"].asString();
@@ -83,16 +125,14 @@ void MainWindow::updateStatementItems(std::string statementName){
         };
 
     };
-    std::cout << "Total: " << monthBalance << std::endl;
-    // Set total
-    QString monthTotalQ = QString::number(monthTotal);
-    // Set balance
-    QString monthBalanceQ = QString::number(monthBalance);
-    //set Start & end bal
-    std::string startBal = statement[0]["Balance"].asString();
-    std::string endBal = statement[statement.size()-1]["Balance"].asString();
-   // float diff = std::stof(endBal) - std::stof(startBal);
-   */
+
+    dbg->out("Setting totals...");
+    cell = new QTableWidgetItem();
+    cell->setText(QString::fromStdString(std::to_string(monthTotal)));
+    totalsTable->setItem(0, 1, cell);
+
+   // statementTable->adjustSize();
+
 
 };
 

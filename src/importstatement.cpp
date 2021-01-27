@@ -1,10 +1,12 @@
 #include "importstatement.h"
 #include "../ui/ui_importstatement.h"
-#include "CsvParser.h"
+
 #include "database.h"
 
+#include <cppcsv/include/CsvParser.h>
 #include <QFileDialog>
 #include <iostream>
+#include <json/json.h>
 
 importStatement::importStatement(QWidget *parent) :
     QDialog(parent),
@@ -28,7 +30,8 @@ void importStatement::submitted(){
     std::string statementName = ui->statementName->text().toStdString();
     database *db = database::instance();
     CsvParser smt(statementPath);
-    smt.loadStatement(statementName);
+    Json::Value statement = smt.loadStatement(statementName);
+    db->addStatement(statement, statementName);
     db->save();
 }
 

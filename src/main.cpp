@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <iostream>
 
-#include "CsvParser.h"
+#include <cppcsv/include/CsvParser.h>
 
 int main(int argc, char *argv[])
 {

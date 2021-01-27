@@ -68,7 +68,7 @@ std::string database::stringify(Json::Value in){
 
 int database::createNewSave(){
 	savefile = fopen("FinancialOrganiser.dat", "ab+");
-	fclose(savefile);
+    closeSave();
 	return 0;
 };
 
@@ -82,7 +82,7 @@ int database::readSaveFile(){
 	std::string value = buffer.str();
 	Json::Reader reader;
     bool b = reader.parse(value, state);
-	return 0;
+    return b;
 };
 
 int database::loadSavedState(){
