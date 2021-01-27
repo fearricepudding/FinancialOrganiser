@@ -30,7 +30,7 @@ private:
 
 private slots:
 	void openStatementImporter();
-    void statementItemClicked(QListWidgetItem *item);
+   // void statementItemClicked(QListWidgetItem *item);
     void openStatements();
     void changedStatement(std::string name);
 

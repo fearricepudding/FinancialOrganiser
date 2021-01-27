@@ -37,7 +37,7 @@ int database::save(){
 };
 
 int database::openSave(){
-	savefile = fopen("./FinancialOrganiser.dat", "ab+");
+
 	if(savefile!=NULL){
 		return 0;
 	}else{
@@ -47,10 +47,12 @@ int database::openSave(){
 
 int database::closeSave(){
 	fclose(savefile);
+    savefile = NULL;
 	return 0;
 };
 
 int database::writeToSave(){
+    savefile = fopen("./FinancialOrganiser.dat", "w");
 	std::string out = stringify(state);
 	const void * buffer = out.c_str();
 	fwrite(buffer, 1, out.length(), savefile);
@@ -71,6 +73,7 @@ int database::createNewSave(){
 };
 
 int database::readSaveFile(){
+    savefile = fopen("./FinancialOrganiser.dat", "ab+");
 	std::stringstream buffer;
     char str[10000];
     while (fread(str, 1, 1000, savefile) != NULL){
@@ -83,7 +86,6 @@ int database::readSaveFile(){
 };
 
 int database::loadSavedState(){
-	openSave();
 	readSaveFile();
 	closeSave();
 	return 0;	
