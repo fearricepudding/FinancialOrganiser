@@ -7,6 +7,7 @@ class debug{
 private:
     bool m_enable = false;
     int m_verbosity = 0;
+    char *prefix = "[DEBUG] ";
 public:
     debug(bool enable, int verbosity){
         m_enable = enable;
@@ -14,13 +15,13 @@ public:
     };
 
     void out(int i){
-        std::cout << i << std::endl;
+        std::cout << prefix <<  i << std::endl;
     };
     void out(std::string s){
-        std::cout << s << std::endl;
+        std::cout << prefix << s << std::endl;
     };
     void out(char c){
-        std::cout << c << std::endl;
+        std::cout << prefix << c << std::endl;
     };
 
 };

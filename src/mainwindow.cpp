@@ -87,42 +87,49 @@ void MainWindow::updateStatementItems(std::string statementName){
 
     dbg->out("Looping statement...");
     for(int i = 0; i < statement.size(); i++){
-        dbg->out("Reading item: ");
-        dbg->out(i);
         Json::Value item = statement[i];
         // Add item to list
-        text = item["Transaction Description"].asCString();
-        if(strlen(text) > 0){
-            QTableWidgetItem *cell = new QTableWidgetItem(text);
-            statementTable->setItem(i, 0, cell);
-        };
+        if(!item["Transaction Description"].empty()){
+            text = item["Transaction Description"].asCString();
+            if(strlen(text) > 0){
+                QTableWidgetItem *cell = new QTableWidgetItem(text);
+                statementTable->setItem(i, 0, cell);
+            };
+        }
 
-        cell = new QTableWidgetItem();
-        text = item["Debit Amount"].asCString();
-        cell->setTextColor(Qt::red);
-        if(strlen(text) <= 0){
-            text = item["Credit Amount"].asCString();
-            cell->setTextColor(Qt::green);
+        if(!item["Debit Amount"].empty()){
+            cell = new QTableWidgetItem();
+            text = item["Debit Amount"].asCString();
+            cell->setTextColor(Qt::red);
             if(strlen(text) <= 0){
-                text = "err";
-            }
-        };
-        cell->setText(text);
-        statementTable->setItem(i, 1, cell);
+                text = item["Credit Amount"].asCString();
+                cell->setTextColor(Qt::green);
+                if(strlen(text) <= 0){
+                    text = "err";
+                }
+            };
+            std::string debit = item["Debit Amount"].asString();
+            if(debit.length() > 0){
+                monthTotal += std::stof(debit);
+                monthBalance -= std::stof(debit);
+            };
+            cell->setText(text);
+            statementTable->setItem(i, 1, cell);
+        }
+
 
 
         // Get total spent
-        std::string debit = item["Debit Amount"].asString();
-        if(debit.length() > 0){
-            monthTotal += std::stof(debit);
-            monthBalance -= std::stof(debit);
-        };
+
+
 
         // Get credits
-        std::string credit = item["Credit Amount"].asString();
-        if(credit.length() > 0){
-            monthBalance += std::stof(credit);
-        };
+        if(!item["Credit Amount"].empty()){
+            std::string credit = item["Credit Amount"].asString();
+            if(credit.length() > 0){
+                monthBalance += std::stof(credit);
+            };
+        }
 
     };
 

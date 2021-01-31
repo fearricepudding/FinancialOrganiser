@@ -27,6 +27,7 @@ private:
 	int readSaveFile();
 	std::string stringify(Json::Value in);
 
+    int readall(FILE *in, char **dataptr, size_t *sizeptr);
 };
 
 #endif
