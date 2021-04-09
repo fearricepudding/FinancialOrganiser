@@ -3,10 +3,11 @@
 
 #include "database.h"
 
-#include <cppcsv/include/CsvParser.h>
 #include <QFileDialog>
 #include <iostream>
 #include <json/json.h>
+
+#include "cppcsv.h"
 
 importStatement::importStatement(QWidget *parent) :
     QDialog(parent),
@@ -26,11 +27,14 @@ void importStatement::findStatement(){
 }
 
 void importStatement::submitted(){
+	std::cout << "[*] Importing new statement" << std::endl;
     std::string statementPath = ui->statementPath->text().toStdString();
     std::string statementName = ui->statementName->text().toStdString();
+	std::cout << "[*] Statement name: " << statementName << "\n[*] Statement path: " << statementPath << std::endl;
     database *db = database::instance();
-    CsvParser smt(statementPath);
-    Json::Value statement = smt.loadStatement(statementName);
+	csvReader *reader = new csvReader();;
+	Json::Value statement = reader->readFile(statementPath, ",");
+	std::cout << "File data: " << reader->stringify(statement) << std::endl;
     db->addStatement(statement, statementName);
     db->save();
 }

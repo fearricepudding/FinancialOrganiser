@@ -54,8 +54,12 @@ void MainWindow::setTotalsTable(){
     totalsTable->setHorizontalHeaderLabels(titles);
 
     QTableWidgetItem *cell = new QTableWidgetItem();
-    cell->setText("Total Bills: ");
+    cell->setText("Total Out");
     totalsTable->setItem(0, 0, cell);
+
+	cell = new QTableWidgetItem();
+	cell->setText("Total in:");
+	totalsTable->setItem(1, 0, cell);
 }
 
 
@@ -75,6 +79,8 @@ void MainWindow::updateStatementItems(std::string statementName){
 
     dbg->out("Init totals table...");
     setTotalsTable();
+
+	float totalIn = 0.f; 
 
     if(statement.size() <= 0){
         return;
@@ -117,17 +123,12 @@ void MainWindow::updateStatementItems(std::string statementName){
             statementTable->setItem(i, 1, cell);
         }
 
-
-
-        // Get total spent
-
-
-
-        // Get credits
+		// Total in
         if(!item["Credit Amount"].empty()){
             std::string credit = item["Credit Amount"].asString();
             if(credit.length() > 0){
                 monthBalance += std::stof(credit);
+				totalIn += std::stof(credit);
             };
         }
 

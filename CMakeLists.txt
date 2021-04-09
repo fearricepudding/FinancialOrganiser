@@ -14,9 +14,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(jsoncpp CONFIG REQUIRED)
-
-add_subdirectory(cppcsv)
 
 include_directories(
   /usr/include
@@ -31,18 +28,19 @@ add_executable(FinancialOrganiser
   ui/mainwindow.ui
   ui/importstatement.ui
   ui/mystatements.ui
-  
+
   src/main.cpp
   src/mainwindow.cpp
   src/importstatement.cpp
   src/database.cpp
   src/mystatements.cpp
-  
+
   src/mainwindow.h
   src/importstatement.h
   src/database.h
   src/mystatements.h
   src/debug.h
+  src/cppcsv.h
 )
 
-target_link_libraries(FinancialOrganiser PRIVATE Qt5::Widgets jsoncpp_lib jsoncpp_object cppcsv)
+target_link_libraries(FinancialOrganiser PRIVATE Qt5::Widgets jsoncpp)
