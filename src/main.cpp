@@ -1,9 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <iostream>
-#include <json/json.h>
-
-#include <cppcsv/include/CsvParser.h>
+#include <jsoncpp/json/json.h>
 
 int main(int argc, char *argv[])
 {

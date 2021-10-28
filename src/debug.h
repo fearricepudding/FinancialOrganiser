@@ -7,7 +7,7 @@ class debug{
 private:
     bool m_enable = false;
     int m_verbosity = 0;
-    char *prefix = "[DEBUG] ";
+    std::string prefix = "[DEBUG] ";
 public:
     debug(bool enable, int verbosity){
         m_enable = enable;

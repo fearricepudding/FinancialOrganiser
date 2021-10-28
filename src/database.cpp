@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <errno.h>
 #include <iostream>
+#include <fstream>
+#include <ostream>
+#include <iterator>
+#include <algorithm>
+#include <string> 
+#include <sstream>
 
 database* database::m_pInstance = NULL;
 
@@ -12,57 +18,36 @@ database* database::instance(){
 	return m_pInstance;
 };
 
-bool database::fileExists(std::string filepath){
-	if (FILE *file = fopen(filepath.c_str(), "r")) {
-        fclose(file);
-        return true;
-    }else{
-        return false;
-    };
-};
+bool database::fileExists(const std::string& name){
+    std::ifstream f(name.c_str());
+    return f.good();
+}
 
 database::database(){
-	 if(!fileExists("./FinancialOrganiser.dat")){
-	 	createNewSave();
-     }else{
-         loadSavedState();
+	 if(fileExists("FO.bin")){
+         readSaveFile();
      };
-
      Json::Value deb = getStatement("2");
      std::cout << stringify(deb) << std::endl;
-
 };
+
+char encrypt( char c ) { return c + 1; }        
+char decrypt( char c ) { return c - 1; }   
 
 database::~database(){};
 
-int database::save(){
-	openSave();
-	writeToSave();
-	closeSave();
-	return 0;
+void database::save(){
+    writeToSave();
 };
 
-int database::openSave(){
-
-	if(savefile!=NULL){
-		return 0;
-	}else{
-		return 1; // File no exists?
-	};
-};
-
-int database::closeSave(){
-	fclose(savefile);
-    savefile = NULL;
-	return 0;
-};
-
-int database::writeToSave(){
-    savefile = fopen("./FinancialOrganiser.dat", "w");
+void database::writeToSave(){
 	std::string out = stringify(state);
-	const void * buffer = out.c_str();
-	fwrite(buffer, 1, out.length(), savefile);
-	return 0;
+    std::ofstream file("FO.bin", std::ios_base::binary);
+    std::ostream_iterator<char> test(file);
+    std::string enc;
+    enc.resize(out.size());
+    transform(out.begin(), out.end(), enc.begin(), encrypt);
+    file.write(enc.c_str(), enc.size());
 };
 
 std::string database::stringify(Json::Value in){
@@ -72,96 +57,28 @@ std::string database::stringify(Json::Value in){
 	return out;
 };
 
-int database::createNewSave(){
-	savefile = fopen("FinancialOrganiser.dat", "ab+");
-    closeSave();
-	return 0;
-};
-
-#ifndef  READALL_CHUNK
-#define  READALL_CHUNK  262144
-#endif
-
-int database::readSaveFile(){
-    savefile = fopen("FinancialOrganiser.dat", "r");
-    char * saveFileData;
-    size_t size;
-    readall(savefile, &saveFileData, &size);
-
-    Json::Reader reader;
-    bool s = reader.parse(saveFileData, state);
-    if(s != 0){
-        std::cout << "Failed to parse savefile" << std::endl;
-    }
-    return s;
+void database::readSaveFile(){
+    std::cout << "[DEBUG] Reading save file" << std::endl;
+    std::ifstream file("FO.bin", std::ios::binary);
+    if(file.good()){
+        std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
+        std::string enc(buffer.begin(), buffer.end());
+        std::string data;
+        data.resize(enc.size());
+        transform(enc.begin(), enc.end(), data.begin(), decrypt);
+        Json::Reader stringReader;
+        stringReader.parse(data, this->state);
+    }else{
+        std::cout << "[ERROR] Failed to read file" << std::endl;
+    };
 }
 
-
-#define  READALL_OK          0  /* Success */
-#define  READALL_INVALID    -1  /* Invalid parameters */
-#define  READALL_ERROR      -2  /* Stream error */
-#define  READALL_TOOMUCH    -3  /* Too much input */
-#define  READALL_NOMEM      -4  /* Out of memory */
-
-int database::readall(FILE *in, char **dataptr, size_t *sizeptr){
-    char  *data = NULL, *temp;
-    size_t size = 0;
-    size_t used = 0;
-    size_t n;
-
-    /* None of the parameters can be NULL. */
-    if (in == NULL || dataptr == NULL || sizeptr == NULL)
-        return READALL_INVALID;
-    /* A read error already occurred? */
-    if (ferror(in))
-        return READALL_ERROR;
-    while (1) {
-        if (used + READALL_CHUNK + 1 > size) {
-            size = used + READALL_CHUNK + 1;
-
-            /* Overflow check. Some ANSI C compilers
-               may optimize this away, though. */
-            if (size <= used) {
-                free(data);
-                return READALL_TOOMUCH;
-            }
-            temp = (char*)realloc(data, size);
-            if (temp == NULL) {
-                free(data);
-                return READALL_NOMEM;
-            }
-            data = temp;
-        }
-        n = fread(data + used, 1, READALL_CHUNK, in);
-        if (n == 0)
-            break;
-        used += n;
-    }
-    if (ferror(in)) {
-        free(data);
-        return READALL_ERROR;
-    }
-    temp = (char*)realloc(data, used + 1);
-    if (temp == NULL) {
-        free(data);
-        return READALL_NOMEM;
-    }
-    data = temp;
-    data[used] = '\0';
-    *dataptr = data;
-    *sizeptr = used;
-    return READALL_OK;
-}
-
-int database::loadSavedState(){
+void database::loadSavedState(){
 	readSaveFile();
-	closeSave();
-	return 0;	
 };
 
-int database::addStatement(Json::Value data, std::string name){
+void database::addStatement(Json::Value data, std::string name){
 	state[name] = data;
-	return 0;
 };
 
 std::string database::getStateAsString(){

@@ -5,7 +5,7 @@
 
 #include <QFileDialog>
 #include <iostream>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 
 #include "cppcsv.h"
 

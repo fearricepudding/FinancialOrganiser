@@ -1,15 +1,15 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 
 class database{
 public:
 	static database* instance();
-	int loadSavedState();
-	int save();
+	void loadSavedState();
+	void save();
 	Json::Value getState();
-	int addStatement(Json::Value data, std::string name);
+	void addStatement(Json::Value data, std::string name);
 	std::string getStateAsString();
     Json::Value getStatement(std::string statementName);
 
@@ -17,16 +17,11 @@ private:
 	static database* m_pInstance;
 	database();
 	~database();
-	FILE* savefile;
-	int openSave();
-	int closeSave();
-	int writeToSave();
+	void writeToSave();
 	Json::Value state;
-	int createNewSave();
-	bool fileExists(std::string filepath);
-	int readSaveFile();
+	bool fileExists(const std::string&);
+	void readSaveFile();
 	std::string stringify(Json::Value in);
-
     int readall(FILE *in, char **dataptr, size_t *sizeptr);
 };
 

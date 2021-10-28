@@ -9,22 +9,11 @@
 
 #include <QTableWidget>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
-    //setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    //this->statusBar()->setSizeGripEnabled(false);
-
-    //this->layout()->setSizeConstraint(QLayout::SetFixedSize);
-    //this->setFixedSize(QSize(770, 619));
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
-    //updateStatementItems(selectedStateament);
-    // Import and open statements
     connect(ui->newStatement, &QPushButton::released, this, &MainWindow::openStatementImporter);
     connect(&myStatementsWindow, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
     connect(ui->openStatements, &QPushButton::released, this, &MainWindow::openStatements);
-
 }
 
 MainWindow::~MainWindow(){
@@ -52,20 +41,26 @@ void MainWindow::setTotalsTable(){
     totalsTable->setRowCount(8);
     totalsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     totalsTable->setHorizontalHeaderLabels(titles);
-
-    QTableWidgetItem *cell = new QTableWidgetItem();
-    cell->setText("Total Out");
-    totalsTable->setItem(0, 0, cell);
-
-	cell = new QTableWidgetItem();
-	cell->setText("Total in:");
-	totalsTable->setItem(1, 0, cell);
+    totalsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
+
+void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char* value, int position){
+    QTableWidgetItem *keyCell = new QTableWidgetItem();
+    QTableWidgetItem *valueCell = new QTableWidgetItem();
+    keyCell->setText(QString::fromUtf8(key));
+    valueCell->setText(QString::fromUtf8(value));
+    table->setItem(position, 0, keyCell);
+    table->setItem(position, 1, valueCell);
+};
 
 
 void MainWindow::updateStatementItems(std::string statementName){
     dbg->out("Updating statement items...");
     Json::Value statement = db->getStatement(statementName);
+
+    if(statement.size() <= 0){
+        return;
+    };
 
     QTableWidget *statementTable = ui->statementTable;
     QTableWidget *totalsTable = ui->statementTotals;
@@ -76,21 +71,16 @@ void MainWindow::updateStatementItems(std::string statementName){
     statementTable->setColumnCount(2);
     statementTable->setRowCount(statement.size());
     statementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    statementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     dbg->out("Init totals table...");
     setTotalsTable();
 
-	float totalIn = 0.f; 
-
-    if(statement.size() <= 0){
-        return;
-    };
-
-    float monthTotal = 0;
-    float monthBalance = 0;
-    const char *text;
-    QTableWidgetItem *cell = new QTableWidgetItem();
-
+    float monthTotal = 0.f;
+    float monthBalance = 0.f;
+    float totalIn = 0.f;
+    float totalOut = 0.f;
+    
     dbg->out("Looping statement...");
     for(int i = 0; i < statement.size(); i++){
         Json::Value item = statement[i];
@@ -135,9 +125,11 @@ void MainWindow::updateStatementItems(std::string statementName){
     };
 
     dbg->out("Setting totals...");
-    cell = new QTableWidgetItem();
-    cell->setText(QString::fromStdString(std::to_string(monthTotal)));
-    totalsTable->setItem(0, 1, cell);
+
+    this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
+    this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
+    this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 2);
+    this->createTableRow(totalsTable, "Testing", "new", 3);
 
    // statementTable->adjustSize();
 
