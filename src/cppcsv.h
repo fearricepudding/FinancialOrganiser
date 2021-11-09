@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdio.h>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <fstream>
 
 class csvReader{

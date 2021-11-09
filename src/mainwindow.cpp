@@ -85,44 +85,40 @@ void MainWindow::updateStatementItems(std::string statementName){
     for(int i = 0; i < statement.size(); i++){
         Json::Value item = statement[i];
         // Add item to list
+        const char* title = "**Undefined**";
         if(!item["Transaction Description"].empty()){
-            text = item["Transaction Description"].asCString();
-            if(strlen(text) > 0){
-                QTableWidgetItem *cell = new QTableWidgetItem(text);
-                statementTable->setItem(i, 0, cell);
-            };
+            title = item["Transaction Description"].asCString();
         }
 
+        const char* text = "";
         if(!item["Debit Amount"].empty()){
-            cell = new QTableWidgetItem();
-            text = item["Debit Amount"].asCString();
-            cell->setTextColor(Qt::red);
-            if(strlen(text) <= 0){
-                text = item["Credit Amount"].asCString();
-                cell->setTextColor(Qt::green);
-                if(strlen(text) <= 0){
-                    text = "err";
-                }
-            };
-            std::string debit = item["Debit Amount"].asString();
+            std::string debit = item["Debit Amount"].asCString();
             if(debit.length() > 0){
-                monthTotal += std::stof(debit);
-                monthBalance -= std::stof(debit);
+				try{
+					monthTotal += std::stof(debit);
+					monthBalance -= std::stof(debit);
+				}catch(const std::invalid_argument& ia){
+					std::cout << "Failed to STOF 1" << std::endl;
+				}
             };
-            cell->setText(text);
-            statementTable->setItem(i, 1, cell);
-        }
+            this->createTableRow(statementTable, title, text, i);
+        };
 
 		// Total in
         if(!item["Credit Amount"].empty()){
-            std::string credit = item["Credit Amount"].asString();
-            if(credit.length() > 0){
-                monthBalance += std::stof(credit);
-				totalIn += std::stof(credit);
-            };
-        }
-
-    };
+			std::string credit = item["Credit Amount"].asCString();
+			if(credit.length() > 0)
+				try{
+					if(strlen(text) > 0){
+						monthBalance += std::stof(credit);
+						totalIn += std::stof(credit);
+					};
+				}catch(const std::invalid_argument& ia){
+					std::cout << "Failed to convert value to float" << std::endl;
+				};
+			};
+			this->createTableRow(statementTable, title, text, i);
+        };
 
     dbg->out("Setting totals...");
 
