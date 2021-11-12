@@ -84,51 +84,45 @@ void MainWindow::updateStatementItems(std::string statementName){
     dbg->out("Looping statement...");
     for(int i = 0; i < statement.size(); i++){
         Json::Value item = statement[i];
-        // Add item to list
         const char* title = "**Undefined**";
         if(!item["Transaction Description"].empty()){
             title = item["Transaction Description"].asCString();
         }
 
-        const char* text = "";
+		std::string debit;
         if(!item["Debit Amount"].empty()){
-            std::string debit = item["Debit Amount"].asCString();
-            if(debit.length() > 0){
+            debit = item["Debit Amount"].asCString();
+            if(strlen(debit.c_str()) > 0){
 				try{
 					monthTotal += std::stof(debit);
 					monthBalance -= std::stof(debit);
 				}catch(const std::invalid_argument& ia){
 					std::cout << "Failed to STOF 1" << std::endl;
 				}
+				this->createTableRow(statementTable, title, debit.c_str(), i);
             };
-            this->createTableRow(statementTable, title, text, i);
         };
 
-		// Total in
+		std::string credit;
         if(!item["Credit Amount"].empty()){
-			std::string credit = item["Credit Amount"].asCString();
-			if(credit.length() > 0)
+			credit = item["Credit Amount"].asCString();
+			if(strlen(credit.c_str()) > 0){
 				try{
-					if(strlen(text) > 0){
-						monthBalance += std::stof(credit);
-						totalIn += std::stof(credit);
-					};
+					monthBalance += std::stof(credit);
+					totalIn += std::stof(credit);
 				}catch(const std::invalid_argument& ia){
 					std::cout << "Failed to convert value to float" << std::endl;
 				};
+				this->createTableRow(statementTable, title, credit.c_str(), i);
 			};
-			this->createTableRow(statementTable, title, text, i);
         };
 
+	};
     dbg->out("Setting totals...");
 
     this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
     this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
     this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 2);
-    this->createTableRow(totalsTable, "Testing", "new", 3);
-
-   // statementTable->adjustSize();
-
 
 };
 
