@@ -37,6 +37,7 @@ void importStatement::submitted(){
 	std::cout << "File data: " << reader->stringify(statement) << std::endl;
     db->addStatement(statement, statementName);
     db->save();
+    emit newStatement(statementName);
 }
 
 importStatement::~importStatement()

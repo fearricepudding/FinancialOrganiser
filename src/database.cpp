@@ -27,7 +27,7 @@ database::database(){
 	 if(fileExists("FO.bin")){
          readSaveFile();
      };
-     Json::Value deb = getStatement("2");
+     Json::Value deb = new Json::Value();
      std::cout << stringify(deb) << std::endl;
 };
 
