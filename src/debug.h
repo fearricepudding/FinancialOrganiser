@@ -5,24 +5,34 @@
 
 class debug{
 private:
-    bool m_enable = false;
-    int m_verbosity = 0;
-    std::string prefix = "[DEBUG] ";
+    bool _enable = false;
+    int _verbosity = 0;
 public:
     debug(bool enable, int verbosity){
-        m_enable = enable;
-        m_verbosity = verbosity;
+        this->_enable = enable;
+        this->_verbosity = verbosity;
     };
+    debug(bool enable){
+        this->_enable = enable;
+    }
 
-    void out(int i){
-        std::cout << prefix <<  i << std::endl;
-    };
-    void out(std::string s){
-        std::cout << prefix << s << std::endl;
-    };
-    void out(char c){
-        std::cout << prefix << c << std::endl;
-    };
+    template <typename T>
+    T out(T o){
+        if(this->_verbosity >= 0 && this->_enable)
+            std::cout << "[DEBUG] " << o << std::endl;
+    }
+
+    template <typename T>
+    T warn(T o){
+        if(this->_verbosity >= 1 && this->_enable)
+            std::cout << "[WARN] " << o << std::endl;
+    }
+
+    template <typename T>
+    T err(T o){
+        if(this->_verbosity >= 2 && this->_enable)
+            std::cout << "[ERR] " << o << std::endl;
+    }
 
 };
 

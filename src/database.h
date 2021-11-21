@@ -3,6 +3,8 @@
 
 #include <json/json.h>
 
+#include "debug.h"
+
 class database{
 public:
 	static database* instance();
@@ -14,6 +16,7 @@ public:
     Json::Value getStatement(std::string statementName);
 
 private:
+    debug *dgb = new debug(true, 2);
 	static database* m_pInstance;
 	database();
 	~database();

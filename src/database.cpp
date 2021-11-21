@@ -58,7 +58,6 @@ std::string database::stringify(Json::Value in){
 };
 
 void database::readSaveFile(){
-    std::cout << "[DEBUG] Reading save file" << std::endl;
     std::ifstream file("FO.bin", std::ios::binary);
     if(file.good()){
         std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
@@ -86,6 +85,7 @@ std::string database::getStateAsString(){
 };
 
 Json::Value database::getStatement(std::string statementName){
+    dgb->out("Getting statement data");
     Json::Value statement = state[statementName];
     return statement;
 };

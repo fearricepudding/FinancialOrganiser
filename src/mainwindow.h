@@ -27,8 +27,8 @@ private:
     importStatement newStatement;
     myStatements myStatementsWindow;
     database* db = database::instance();
-    std::string selectedStateament = "";
-    debug *dbg = new debug(true, 0);
+    std::string selectedStateament;
+    debug *dbg = new debug(true, 2);
     void clearStats();
     void createTableRow(QTableWidget *&table, const char*, const char*, int position);
 
