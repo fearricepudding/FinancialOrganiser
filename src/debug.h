@@ -17,19 +17,19 @@ public:
     }
 
     template <typename T>
-    T out(T o){
+    void out(T o){
         if(this->_verbosity >= 0 && this->_enable)
             std::cout << "[DEBUG] " << o << std::endl;
     }
 
     template <typename T>
-    T warn(T o){
+    void warn(T o){
         if(this->_verbosity >= 1 && this->_enable)
             std::cout << "[WARN] " << o << std::endl;
     }
 
     template <typename T>
-    T err(T o){
+    void err(T o){
         if(this->_verbosity >= 2 && this->_enable)
             std::cout << "[ERR] " << o << std::endl;
     }
