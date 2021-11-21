@@ -16,7 +16,7 @@ public:
     Json::Value getStatement(std::string statementName);
 
 private:
-    debug *dgb = new debug(true, 2);
+    debug *dbg = new debug(true, 2);
 	static database* m_pInstance;
 	database();
 	~database();

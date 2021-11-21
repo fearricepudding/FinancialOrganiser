@@ -112,7 +112,7 @@ void MainWindow::updateStatementItems(std::string statementName)
                 }
                 catch (const std::invalid_argument &ia)
                 {
-                    std::cout << "Failed to STOF 1" << std::endl;
+                    dbg->err("Failed to STOF debit");
                 }
                 this->createTableRow(statementTable, title, debit.c_str(), i);
             };
@@ -131,7 +131,7 @@ void MainWindow::updateStatementItems(std::string statementName)
                 }
                 catch (const std::invalid_argument &ia)
                 {
-                    std::cout << "Failed to convert value to float" << std::endl;
+                    dbg->err("Failed to STOF credit");
                 };
                 this->createTableRow(statementTable, title, credit.c_str(), i);
             };

@@ -28,7 +28,6 @@ database::database(){
          readSaveFile();
      };
      Json::Value deb = new Json::Value();
-     std::cout << stringify(deb) << std::endl;
 };
 
 char encrypt( char c ) { return c + 1; }        
@@ -68,7 +67,7 @@ void database::readSaveFile(){
         Json::Reader stringReader;
         stringReader.parse(data, this->state);
     }else{
-        std::cout << "[ERROR] Failed to read file" << std::endl;
+        dbg->err("Failed to read database");
     };
 }
 
@@ -85,7 +84,7 @@ std::string database::getStateAsString(){
 };
 
 Json::Value database::getStatement(std::string statementName){
-    dgb->out("Getting statement data");
+    dbg->out("Getting statement data");
     Json::Value statement = state[statementName];
     return statement;
 };
