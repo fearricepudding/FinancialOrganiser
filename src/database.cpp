@@ -1,6 +1,14 @@
 #include "database.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <iostream>
+#include <fstream>
+#include <ostream>
+#include <iterator>
+#include <algorithm>
+#include <string> 
+#include <sstream>
 
 database* database::m_pInstance = NULL;
 
@@ -10,51 +18,36 @@ database* database::instance(){
 	return m_pInstance;
 };
 
-bool database::fileExists(std::string filepath){
-	if (FILE *file = fopen(filepath.c_str(), "r")) {
-        fclose(file);
-        return true;
-    }else{
-        return false;
-    };
-};
+bool database::fileExists(const std::string& name){
+    std::ifstream f(name.c_str());
+    return f.good();
+}
 
 database::database(){
-	 if(!fileExists("./FinancialOrganiser.dat")){
-	 	createNewSave();
-     }else{
-         loadSavedState();
+	 if(fileExists("FO.bin")){
+         readSaveFile();
      };
+     Json::Value deb = new Json::Value();
+     std::cout << stringify(deb) << std::endl;
 };
+
+char encrypt( char c ) { return c + 1; }        
+char decrypt( char c ) { return c - 1; }   
 
 database::~database(){};
 
-int database::save(){
-	openSave();
-	writeToSave();
-	closeSave();
-	return 0;
+void database::save(){
+    writeToSave();
 };
 
-int database::openSave(){
-	savefile = fopen("./FinancialOrganiser.dat", "ab+");
-	if(savefile!=NULL){
-		return 0;
-	}else{
-		return 1; // File no exists?
-	};
-};
-
-int database::closeSave(){
-	fclose(savefile);
-	return 0;
-};
-
-int database::writeToSave(){
+void database::writeToSave(){
 	std::string out = stringify(state);
-	const void * buffer = out.c_str();
-	fwrite(buffer, 1, out.length(), savefile);
-	return 0;
+    std::ofstream file("FO.bin", std::ios_base::binary);
+    std::ostream_iterator<char> test(file);
+    std::string enc;
+    enc.resize(out.size());
+    transform(out.begin(), out.end(), enc.begin(), encrypt);
+    file.write(enc.c_str(), enc.size());
 };
 
 std::string database::stringify(Json::Value in){
@@ -64,34 +57,28 @@ std::string database::stringify(Json::Value in){
 	return out;
 };
 
-int database::createNewSave(){
-	savefile = fopen("FinancialOrganiser.dat", "ab+");
-	fclose(savefile);
-	return 0;
-};
-
-int database::readSaveFile(){
-	std::stringstream buffer;
-    char str[10000];
-    while (fread(str, 1, 1000, savefile) != NULL){
-        buffer << str;
+void database::readSaveFile(){
+    std::cout << "[DEBUG] Reading save file" << std::endl;
+    std::ifstream file("FO.bin", std::ios::binary);
+    if(file.good()){
+        std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
+        std::string enc(buffer.begin(), buffer.end());
+        std::string data;
+        data.resize(enc.size());
+        transform(enc.begin(), enc.end(), data.begin(), decrypt);
+        Json::Reader stringReader;
+        stringReader.parse(data, this->state);
+    }else{
+        std::cout << "[ERROR] Failed to read file" << std::endl;
     };
-	std::string value = buffer.str();
-	Json::Reader reader;
-    bool b = reader.parse(value, state);
-	return 0;
-};
+}
 
-int database::loadSavedState(){
-	openSave();
+void database::loadSavedState(){
 	readSaveFile();
-	closeSave();
-	return 0;	
 };
 
-int database::addStatement(Json::Value data, std::string name){
+void database::addStatement(Json::Value data, std::string name){
 	state[name] = data;
-	return 0;
 };
 
 std::string database::getStateAsString(){

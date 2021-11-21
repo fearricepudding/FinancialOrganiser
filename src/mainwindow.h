@@ -5,7 +5,9 @@
 #include "importstatement.h"
 #include "database.h"
 #include "mystatements.h"
+#include "debug.h"
 #include <QListWidgetItem>
+#include <QTableWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,12 +27,15 @@ private:
     importStatement newStatement;
     myStatements myStatementsWindow;
     database* db = database::instance();
-    std::string selectedStateament = "tmp";
+    std::string selectedStateament = "";
+    debug *dbg = new debug(true, 0);
     void clearStats();
+    void createTableRow(QTableWidget *&table, const char*, const char*, int position);
 
+    void setTotalsTable();
 private slots:
 	void openStatementImporter();
-    void statementItemClicked(QListWidgetItem *item);
+   // void statementItemClicked(QListWidgetItem *item);
     void openStatements();
     void changedStatement(std::string name);
 

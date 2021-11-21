@@ -5,107 +5,146 @@
 #include "database.h"
 #include "mystatements.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+#include <QTableWidget>
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    updateStatementItems(selectedStateament);
     connect(ui->newStatement, &QPushButton::released, this, &MainWindow::openStatementImporter);
-    connect(ui->statementItems, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(statementItemClicked(QListWidgetItem*)));
-    connect(ui->openStatements, &QPushButton::released, this, &MainWindow::openStatements);
     connect(&myStatementsWindow, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
+    connect(&newStatement, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
+    connect(ui->openStatements, &QPushButton::released, this, &MainWindow::openStatements);
 }
 
-MainWindow::~MainWindow(){
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-void MainWindow::openStatements(){
+void MainWindow::openStatements()
+{
+    dbg->out("Opening statements");
     myStatementsWindow.updateList();
     myStatementsWindow.show();
 }
 
-void MainWindow::changedStatement(std::string name){
+void MainWindow::changedStatement(std::string name)
+{
+    dbg->out("New statement selected: " + name);
     selectedStateament = name;
     updateStatementItems(selectedStateament);
 }
 
-void MainWindow::statementItemClicked(QListWidgetItem *item){
-    QListWidget *list = ui->statementItems;
-    int row = list->row(item);
-    Json::Value statement = db->getStatement(selectedStateament);
-    Json::Value itemsData = statement[row];
-    // set item name
-    ui->itemName->setText(itemsData["Transaction Description"].asCString());
-    // Set value
-    std::string credit = itemsData["Credit Amount"].asString();
-    std::string debit = itemsData["Debit Amount"].asString();
-    if(credit.length() > 0){
-        ui->itemValue->setText("+ £"+QString::fromStdString(credit));
-    }else if(debit.length() > 0){
-        ui->itemValue->setText("- £"+QString::fromStdString(debit));
-    };
-    // Set date
-    std::string date = itemsData["Transaction Date"].asString();
-    ui->itemDate->setText(QString::fromStdString(date));
-};
-
-void MainWindow::clearStats(){
-    ui->itemName->setText("");
-    ui->itemValue->setText("");
-    ui->itemDate->setText("");
-    ui->balStart->setText("");
-    ui->balEnd->setText("");
-    ui->balDiff->setText("");
-    ui->monthTotal->setText("");
-    ui->monthBalance->setText("");
+void MainWindow::setTotalsTable()
+{
+    dbg->out("Setting up totals table");
+    QTableWidget *totalsTable = ui->statementTotals;
+    QStringList titles;
+    titles << "Total"
+           << "Price";
+    totalsTable->setColumnCount(2);
+    totalsTable->setRowCount(8);
+    totalsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    totalsTable->setHorizontalHeaderLabels(titles);
+    totalsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
-void MainWindow::updateStatementItems(std::string statementName){
-    Json::Value statement = db->getStatement(statementName);
-    QListWidget *list = ui->statementItems;
-    list->clear();
-    clearStats();
-    if(statement.size() <= 0){
-        return;
-    };
-    QLabel *monthTotalLabel = ui->monthTotal;
-    QLabel *monthBalanceLabel = ui->monthBalance;
-    float monthTotal = 0;
-    float monthBalance = 0;
-    for(int i = 0; i < statement.size(); i++){
-        Json::Value item = statement[i];
-        // Add item to list
-        list->addItem(item["Transaction Description"].asCString());
-        // Get total spent
-        std::string debit = item["Debit Amount"].asString();
-        if(debit.length() > 0){
-            monthTotal += std::stof(debit);
-            monthBalance -= std::stof(debit);
-        };
-        // Get credits
-        std::string credit = item["Credit Amount"].asString();
-        if(credit.length() > 0){
-            monthBalance += std::stof(credit);
-        };
-    };
-    std::cout << "Total: " << monthBalance << std::endl;
-    // Set total
-    QString monthTotalQ = QString::number(monthTotal);
-    monthTotalLabel->setText("£"+monthTotalQ);
-    // Set balance
-    QString monthBalanceQ = QString::number(monthBalance);
-    monthBalanceLabel->setText("£"+monthBalanceQ);
-    //set Start & end bal
-    std::string startBal = statement[0]["Balance"].asString();
-    std::string endBal = statement[statement.size()-1]["Balance"].asString();
-    float diff = std::stof(endBal) - std::stof(startBal);
-    ui->balStart->setText("£"+QString::fromStdString(startBal));
-    ui->balEnd->setText("£"+QString::fromStdString(endBal));
-    ui->balDiff->setText("£"+QString::number(diff));
+void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position)
+{
+    QTableWidgetItem *keyCell = new QTableWidgetItem();
+    QTableWidgetItem *valueCell = new QTableWidgetItem();
+    keyCell->setText(QString::fromUtf8(key));
+    valueCell->setText(QString::fromUtf8(value));
+    table->setItem(position, 0, keyCell);
+    table->setItem(position, 1, valueCell);
 };
 
-void MainWindow::openStatementImporter(){
+void MainWindow::updateStatementItems(std::string statementName)
+{
+    dbg->out("Updating statement items...");
+    Json::Value statement = db->getStatement(statementName);
+
+    if (statement.size() <= 0)
+    {
+        return;
+    };
+
+    QTableWidget *statementTable = ui->statementTable;
+    QTableWidget *totalsTable = ui->statementTotals;
+
+    QStringList titles;
+    titles << "Reference"
+           << "Ammount";
+    statementTable->setHorizontalHeaderLabels(titles);
+    statementTable->setColumnCount(2);
+    statementTable->setRowCount(statement.size());
+    statementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    statementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    dbg->out("Init totals table...");
+    setTotalsTable();
+
+    float monthTotal = 0.f;
+    float monthBalance = 0.f;
+    float totalIn = 0.f;
+    float totalOut = 0.f;
+
+    dbg->out("Looping statement...");
+    for (int i = 0; i < statement.size(); i++)
+    {
+        Json::Value item = statement[i];
+        const char *title = "**Undefined**";
+        if (!item["Transaction Description"].empty())
+        {
+            title = item["Transaction Description"].asCString();
+        }
+
+        std::string debit;
+        if (!item["Debit Amount"].empty())
+        {
+            debit = item["Debit Amount"].asCString();
+            if (strlen(debit.c_str()) > 0)
+            {
+                try
+                {
+                    monthTotal += std::stof(debit);
+                    monthBalance -= std::stof(debit);
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cout << "Failed to STOF 1" << std::endl;
+                }
+                this->createTableRow(statementTable, title, debit.c_str(), i);
+            };
+        };
+
+        std::string credit;
+        if (!item["Credit Amount"].empty())
+        {
+            credit = item["Credit Amount"].asCString();
+            if (strlen(credit.c_str()) > 0)
+            {
+                try
+                {
+                    monthBalance += std::stof(credit);
+                    totalIn += std::stof(credit);
+                }
+                catch (const std::invalid_argument &ia)
+                {
+                    std::cout << "Failed to convert value to float" << std::endl;
+                };
+                this->createTableRow(statementTable, title, credit.c_str(), i);
+            };
+        };
+    };
+    dbg->out("Setting totals...");
+
+    this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
+    this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
+    this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 2);
+};
+
+void MainWindow::openStatementImporter()
+{
     newStatement.show();
 };

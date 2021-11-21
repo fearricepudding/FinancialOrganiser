@@ -21,6 +21,9 @@ private:
 private slots:
     void findStatement();
     void submitted();
+
+signals:
+    void newStatement(std::string statement);
 };
 
 #endif // IMPORTSTATEMENT_H

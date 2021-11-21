@@ -1,1 +1,7 @@
 build
+out
+CMakeFiles
+winds
+*.user
+.vs
+.vscode
