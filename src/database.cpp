@@ -40,7 +40,7 @@ void database::save(){
 };
 
 void database::writeToSave(){
-	std::string out = stringify(state);
+	std::string out = stringify(this->state);
     std::ofstream file("FO.bin", std::ios_base::binary);
     std::ostream_iterator<char> test(file);
     std::string enc;
@@ -76,19 +76,34 @@ void database::loadSavedState(){
 };
 
 void database::addStatement(Json::Value data, std::string name){
-	state[name] = data;
+    this->state[name] = data;
 };
 
 std::string database::getStateAsString(){
-	return stringify(state);
+	return stringify(this->state);
 };
 
 Json::Value database::getStatement(std::string statementName){
     dbg->out("Getting statement data");
-    Json::Value statement = state[statementName];
+    Json::Value statement = this->state[statementName];
     return statement;
 };
 
 Json::Value database::getState(){
-    return state;
+    return  this->state;
 };
+
+Json::Value database::getBills() {
+    Json::Value bills = this->state["bills"];
+    return bills;
+}
+
+void database::addBills(Json::Value bills) {
+    Json::Value current = this->getBills();
+    for(std::string bill : bills.getMemberNames()){
+        std::string value = bills[bill].asString();
+        current[bill] = value;
+    }
+    this->state["bills"] = current;
+    this->save();
+}

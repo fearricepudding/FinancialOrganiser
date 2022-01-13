@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1171</width>
+    <width>1058</width>
     <height>978</height>
    </rect>
   </property>
@@ -52,28 +52,51 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Remove Statement</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="2" column="2">
-       <widget class="QTableWidget" name="tableWidget_3"/>
+       <widget class="QTableWidget" name="billsTable">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QTableWidget" name="statementTable"/>
+       <widget class="QTableWidget" name="statementTable">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QTableWidget" name="statementTotals"/>
+         <widget class="QTableWidget" name="statementTotals">
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QTableWidget" name="tableWidget_2"/>
+         <widget class="QTableWidget" name="tableWidget_2">
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
       <item row="1" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="newbillButton">
           <property name="text">
            <string>Add Bill</string>
           </property>
@@ -92,6 +115,13 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>Remove Bill</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -103,8 +133,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1171</width>
-     <height>24</height>
+     <width>1058</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>

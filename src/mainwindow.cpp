@@ -13,12 +13,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->newStatement, &QPushButton::released, this, &MainWindow::openStatementImporter);
     connect(&myStatementsWindow, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
     connect(&newStatement, SIGNAL(newStatement(std::string)), this, SLOT(changedStatement(std::string)));
+    connect(&newbillWindow, SIGNAL(refreshBills()), this, SLOT(refreshBills()));
     connect(ui->openStatements, &QPushButton::released, this, &MainWindow::openStatements);
+    connect(ui->newbillButton, &QPushButton::released, this, &MainWindow::openNewbill);
+    this->refreshBills();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    this->destroy();
+}
+
+void MainWindow::openNewbill() {
+    dbg->out("Openning new bill window");
+    newbillWindow.populate();
+    newbillWindow.show();
 }
 
 void MainWindow::openStatements()
@@ -35,18 +45,29 @@ void MainWindow::changedStatement(std::string name)
     updateStatementItems(selectedStateament);
 }
 
-void MainWindow::setTotalsTable()
+void MainWindow::setupTotalsTable(QTableWidget *&totalsTable, int size)
 {
     dbg->out("Setting up totals table");
-    QTableWidget *totalsTable = ui->statementTotals;
     QStringList titles;
     titles << "Total"
            << "Price";
     totalsTable->setColumnCount(2);
-    totalsTable->setRowCount(8);
+    totalsTable->setRowCount(size);
     totalsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     totalsTable->setHorizontalHeaderLabels(titles);
     totalsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+}
+
+void MainWindow::setupStatementTable(QTableWidget*& statementTable, int size)
+{
+    QStringList titles;
+    titles << "Reference"
+           << "Ammount";
+    statementTable->setColumnCount(2);
+    statementTable->setRowCount(size);
+    statementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    statementTable->setHorizontalHeaderLabels(titles);
+    statementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position)
@@ -66,23 +87,16 @@ void MainWindow::updateStatementItems(std::string statementName)
 
     if (statement.size() <= 0)
     {
+        dbg->err("Statement size invalid");
         return;
     };
 
     QTableWidget *statementTable = ui->statementTable;
     QTableWidget *totalsTable = ui->statementTotals;
 
-    QStringList titles;
-    titles << "Reference"
-           << "Ammount";
-    statementTable->setHorizontalHeaderLabels(titles);
-    statementTable->setColumnCount(2);
-    statementTable->setRowCount(statement.size());
-    statementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    statementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-    dbg->out("Init totals table...");
-    setTotalsTable();
+    dbg->out("Init tables...");
+    setupTotalsTable(totalsTable, 3);
+    setupStatementTable(statementTable, statement.size());
 
     float monthTotal = 0.f;
     float monthBalance = 0.f;
@@ -148,3 +162,24 @@ void MainWindow::openStatementImporter()
 {
     newStatement.show();
 };
+
+void MainWindow::refreshBills(){
+    dbg->out("Refresh bills");
+    QTableWidget *table = ui->billsTable;
+    Json::Value bills = db->getBills();
+    QStringList titles;
+    titles << "Reference"
+        << "Ammount";
+    table->setColumnCount(2);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setHorizontalHeaderLabels(titles);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->setRowCount(bills.size());
+    int itt = 0;
+    for (std::string item : bills.getMemberNames()) {
+        std::cout << "BILL: " << item << std::endl;
+        std::string value = bills[item].asString();
+        this->createTableRow(table, item.c_str(), value.c_str(), itt);
+        itt++;
+    }
+}

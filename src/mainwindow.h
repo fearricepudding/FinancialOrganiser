@@ -6,6 +6,7 @@
 #include "database.h"
 #include "mystatements.h"
 #include "debug.h"
+#include "newbill.h"
 #include <QListWidgetItem>
 #include <QTableWidget>
 
@@ -26,18 +27,22 @@ private:
     Ui::MainWindow *ui;
     importStatement newStatement;
     myStatements myStatementsWindow;
+    newbill newbillWindow;
     database* db = database::instance();
     std::string selectedStateament;
     debug *dbg = new debug(true, 2);
-    void clearStats();
     void createTableRow(QTableWidget *&table, const char*, const char*, int position);
+    void setupTotalsTable(QTableWidget *&tableRef, int size);
+    void setupStatementTable(QTableWidget*& tableRef, int size);
 
-    void setTotalsTable();
+public slots:
+    void refreshBills();
+
 private slots:
 	void openStatementImporter();
    // void statementItemClicked(QListWidgetItem *item);
     void openStatements();
+    void openNewbill();
     void changedStatement(std::string name);
-
 };
 #endif // MAINWINDOW_H

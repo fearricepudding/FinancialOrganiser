@@ -14,6 +14,8 @@ public:
 	void addStatement(Json::Value data, std::string name);
 	std::string getStateAsString();
     Json::Value getStatement(std::string statementName);
+	void addBills(Json::Value);
+	Json::Value getBills();
 
 private:
     debug *dbg = new debug(true, 2);
