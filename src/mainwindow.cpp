@@ -166,6 +166,7 @@ void MainWindow::openStatementImporter()
 void MainWindow::refreshBills(){
     dbg->out("Refresh bills");
     QTableWidget *table = ui->billsTable;
+    table->clear();
     Json::Value bills = db->getBills();
     QStringList titles;
     titles << "Reference"

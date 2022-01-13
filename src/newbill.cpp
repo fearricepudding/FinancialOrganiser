@@ -20,7 +20,7 @@ newbill::newbill(QWidget *parent) :
     connect(ui->addStatement, &QPushButton::released, this, &newbill::addStatement);
     connect(ui->removeStatement, &QPushButton::released, this, &newbill::removeStatement);
     connect(ui->autoButton, &QPushButton::released, this, &newbill::autoCompare);
-    connect(&selectbillWindow, SIGNAL(refreshBills), this, SLOT(sendRefreshBills()));
+    connect(&selectbillWindow, SIGNAL(refreshBills()), this, SLOT(sendRefreshBills()));
 }
 
 newbill::~newbill()
@@ -54,7 +54,7 @@ void newbill::autoCompare() {
     Json::Value check;
     Json::Value track;
     bool first = true;
-    float matchPrecision = 10.f;
+    float matchPrecision = 10.f; // XXX: Belongs in config
     for (Json::Value& current : statements) {
         for (int i = 0; i < current.size(); i++) {
             Json::Value transaction = current[i];
@@ -133,6 +133,7 @@ void newbill::populate() {
     database* db = database::instance();
     Json::Value statements = db->getState();
     this->availableStatements->clear();
+    this->selectedStatements->clear();
     for (auto const& id : statements.getMemberNames()) {
         this->availableStatements->addItem(QString::fromStdString(id));
     };
