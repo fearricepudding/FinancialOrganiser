@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(&newbillWindow, SIGNAL(refreshBills()), this, SLOT(refreshBills()));
     connect(ui->openStatements, &QPushButton::released, this, &MainWindow::openStatements);
     connect(ui->newbillButton, &QPushButton::released, this, &MainWindow::openNewbill);
+    totalBills = 0.f;
     this->refreshBills();
 }
 
@@ -128,7 +129,8 @@ void MainWindow::updateStatementItems(std::string statementName)
                 {
                     dbg->err("Failed to STOF debit");
                 }
-                this->createTableRow(statementTable, title, debit.c_str(), i);
+                std::string debitString = "-" + debit;
+                this->createTableRow(statementTable, title, debitString.c_str(), i);
             };
         };
 
@@ -178,9 +180,15 @@ void MainWindow::refreshBills(){
     table->setRowCount(bills.size());
     int itt = 0;
     for (std::string item : bills.getMemberNames()) {
-        std::cout << "BILL: " << item << std::endl;
         std::string value = bills[item].asString();
         this->createTableRow(table, item.c_str(), value.c_str(), itt);
+        try {
+            float valueF = std::stof(value);
+            this->totalBills += valueF;
+        }
+        catch (const std::invalid_argument& ia) {
+            dbg->err("Invalid argument");
+        }
         itt++;
     }
 }

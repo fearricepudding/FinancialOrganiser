@@ -34,6 +34,7 @@ private:
     void createTableRow(QTableWidget *&table, const char*, const char*, int position);
     void setupTotalsTable(QTableWidget *&tableRef, int size);
     void setupStatementTable(QTableWidget*& tableRef, int size);
+    float totalBills;
 
 public slots:
     void refreshBills();
