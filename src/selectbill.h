@@ -4,7 +4,7 @@
 #include <QDialog>
 #include "debug.h"
 #include <json/json.h>
-#include <qtablewidget>
+#include <qtablewidget.h>
 #include "debug.h"
 
 namespace Ui {

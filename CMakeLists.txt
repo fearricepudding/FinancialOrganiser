@@ -17,6 +17,7 @@ find_package(jsoncpp REQUIRED)
 include_directories(
   /usr/include
   /usr/local/include
+  /usr/include/qt/QtWidgets
   ${QT5_INCLUDE_DIR}
   ${JSONCPP_INCLUDE_DIR}
   "D:/vcpkg/installed/x64-windows/include"

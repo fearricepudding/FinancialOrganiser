@@ -32,9 +32,10 @@ private:
     std::string selectedStateament;
     debug *dbg = new debug(true, 2);
     void createTableRow(QTableWidget *&table, const char*, const char*, int position);
-    void setupTotalsTable(QTableWidget *&tableRef, int size);
-    void setupStatementTable(QTableWidget*& tableRef, int size);
+    void createTableRow(QTableWidget *&talbe, const char*, const char*, int position, QBrush background);
+    void setupTable(QTableWidget *&, QStringList &);
     float totalBills;
+    Json::Value bills;
 
 public slots:
     void refreshBills();

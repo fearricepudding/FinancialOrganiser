@@ -46,29 +46,12 @@ void MainWindow::changedStatement(std::string name)
     updateStatementItems(selectedStateament);
 }
 
-void MainWindow::setupTotalsTable(QTableWidget *&totalsTable, int size)
+void MainWindow::setupTable(QTableWidget *&table, QStringList &titles)
 {
-    dbg->out("Setting up totals table");
-    QStringList titles;
-    titles << "Total"
-           << "Price";
-    totalsTable->setColumnCount(2);
-    totalsTable->setRowCount(size);
-    totalsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    totalsTable->setHorizontalHeaderLabels(titles);
-    totalsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-}
-
-void MainWindow::setupStatementTable(QTableWidget*& statementTable, int size)
-{
-    QStringList titles;
-    titles << "Reference"
-           << "Ammount";
-    statementTable->setColumnCount(2);
-    statementTable->setRowCount(size);
-    statementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    statementTable->setHorizontalHeaderLabels(titles);
-    statementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->setColumnCount(titles.size());
+    table->setHorizontalHeaderLabels(titles);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position)
@@ -77,8 +60,15 @@ void MainWindow::createTableRow(QTableWidget *&table, const char *key, const cha
     QTableWidgetItem *valueCell = new QTableWidgetItem();
     keyCell->setText(QString::fromUtf8(key));
     valueCell->setText(QString::fromUtf8(value));
+    int rows = table->rowCount();
+    table->setRowCount(rows+1);
     table->setItem(position, 0, keyCell);
     table->setItem(position, 1, valueCell);
+};
+
+void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position, QBrush background){
+    createTableRow(table, key, value, position);
+    table->itemAt(position, 1)->setBackground(Qt::cyan);
 };
 
 void MainWindow::updateStatementItems(std::string statementName)
@@ -96,8 +86,13 @@ void MainWindow::updateStatementItems(std::string statementName)
     QTableWidget *totalsTable = ui->statementTotals;
 
     dbg->out("Init tables...");
-    setupTotalsTable(totalsTable, 3);
-    setupStatementTable(statementTable, statement.size());
+
+    QStringList titles;
+    titles << "Total" << "Price";
+    setupTable(totalsTable, titles);
+    titles.clear();
+    titles << "Reference" << "Amount";
+    setupTable(statementTable, titles);
 
     float monthTotal = 0.f;
     float monthBalance = 0.f;
@@ -107,11 +102,15 @@ void MainWindow::updateStatementItems(std::string statementName)
     dbg->out("Looping statement...");
     for (int i = 0; i < statement.size(); i++)
     {
+        bool isBill = false;
         Json::Value item = statement[i];
         const char *title = "**Undefined**";
         if (!item["Transaction Description"].empty())
         {
             title = item["Transaction Description"].asCString();
+            if(this->bills.isMember(title)){
+                isBill = true;
+            };
         }
 
         std::string debit;
@@ -158,6 +157,7 @@ void MainWindow::updateStatementItems(std::string statementName)
     this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
     this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
     this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 2);
+    this->createTableRow(totalsTable, "Bills total", std::to_string(this->totalBills).c_str(), 3);
 };
 
 void MainWindow::openStatementImporter()
@@ -169,7 +169,7 @@ void MainWindow::refreshBills(){
     dbg->out("Refresh bills");
     QTableWidget *table = ui->billsTable;
     table->clear();
-    Json::Value bills = db->getBills();
+    this->bills = db->getBills();
     QStringList titles;
     titles << "Reference"
         << "Ammount";
@@ -177,10 +177,10 @@ void MainWindow::refreshBills(){
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setHorizontalHeaderLabels(titles);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->setRowCount(bills.size());
+    table->setRowCount(this->bills.size());
     int itt = 0;
-    for (std::string item : bills.getMemberNames()) {
-        std::string value = bills[item].asString();
+    for (std::string item : this->bills.getMemberNames()) {
+        std::string value = this->bills[item].asString();
         this->createTableRow(table, item.c_str(), value.c_str(), itt);
         try {
             float valueF = std::stof(value);
