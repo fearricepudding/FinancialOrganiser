@@ -1,14 +1,4 @@
 #include "database.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <iostream>
-#include <fstream>
-#include <ostream>
-#include <iterator>
-#include <algorithm>
-#include <string> 
-#include <sstream>
 
 database* database::m_pInstance = NULL;
 
@@ -40,20 +30,13 @@ void database::save(){
 };
 
 void database::writeToSave(){
-	std::string out = stringify(this->state);
+	std::string out = Helpers::stringify(this->state);
     std::ofstream file("FO.bin", std::ios_base::binary);
     std::ostream_iterator<char> test(file);
     std::string enc;
     enc.resize(out.size());
     transform(out.begin(), out.end(), enc.begin(), encrypt);
     file.write(enc.c_str(), enc.size());
-};
-
-std::string database::stringify(Json::Value in){
-	Json::StreamWriterBuilder builder;
-	builder.settings_["indentation"] = "";
-	std::string out = Json::writeString(builder, in);
-	return out;
 };
 
 void database::readSaveFile(){
@@ -64,8 +47,7 @@ void database::readSaveFile(){
         std::string data;
         data.resize(enc.size());
         transform(enc.begin(), enc.end(), data.begin(), decrypt);
-        Json::Reader stringReader;
-        stringReader.parse(data, this->state);
+        this->state = Helpers::parseJson(data);
     }else{
         dbg->err("Failed to read database");
     };
@@ -80,13 +62,13 @@ void database::addStatement(Json::Value data, std::string name){
 };
 
 std::string database::getStateAsString(){
-	return stringify(this->state);
+	return Helpers::stringify(this->state);
 };
 
-Json::Value database::getStatement(std::string statementName){
+Statement database::getStatement(std::string statementName){
     dbg->out("Getting statement data");
-    Json::Value statement = this->state[statementName];
-    return statement;
+    Json::Value statementData = this->state[statementName];
+    return Statement(statementData);
 };
 
 Json::Value database::getState(){

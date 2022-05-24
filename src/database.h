@@ -2,8 +2,20 @@
 #define DATABASE_H
 
 #include <json/json.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <iostream>
+#include <fstream>
+#include <ostream>
+#include <iterator>
+#include <algorithm>
+#include <string> 
+#include <sstream>
 
 #include "debug.h"
+#include "helpers.h"
+#include "statement.h"
 
 class database{
 public:
@@ -13,7 +25,7 @@ public:
 	Json::Value getState();
 	void addStatement(Json::Value data, std::string name);
 	std::string getStateAsString();
-    Json::Value getStatement(std::string statementName);
+    Statement getStatement(std::string statementName);
 	void addBills(Json::Value);
 	Json::Value getBills();
 
@@ -26,7 +38,6 @@ private:
 	Json::Value state;
 	bool fileExists(const std::string&);
 	void readSaveFile();
-	std::string stringify(Json::Value in);
     int readall(FILE *in, char **dataptr, size_t *sizeptr);
 };
 

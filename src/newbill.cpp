@@ -44,9 +44,10 @@ void newbill::autoCompare() {
 
     for (int i = 0; i < statementCount; i++) {
         std::string statementName = ui->selectedStatements->item(i)->text().toStdString();
-        Json::Value statement = db->getStatement(statementName);
-        totalTrans += statement.size();
-        statements.push_back(statement);
+        Statement statement = db->getStatement(statementName);
+        Json::Value transactions = statement.getTransactions();
+        totalTrans += transactions.size();
+        statements.push_back(transactions);
     }
 
     float progressStep = totalTrans / 100;

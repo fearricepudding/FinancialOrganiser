@@ -74,9 +74,10 @@ void MainWindow::createTableRow(QTableWidget *&table, const char *key, const cha
 void MainWindow::updateStatementItems(std::string statementName)
 {
     dbg->out("Updating statement items...");
-    Json::Value statement = db->getStatement(statementName);
+    Statement statement = db->getStatement(statementName);
+    Json::Value transactions = statement.getTransactions();
 
-    if (statement.size() <= 0)
+    if (transactions.size() <= 0)
     {
         dbg->err("Statement size invalid");
         return;
@@ -100,10 +101,10 @@ void MainWindow::updateStatementItems(std::string statementName)
     float totalOut = 0.f;
 
     dbg->out("Looping statement...");
-    for (int i = 0; i < statement.size(); i++)
+    for (int i = 0; i < transactions.size(); i++)
     {
         bool isBill = false;
-        Json::Value item = statement[i];
+        Json::Value item = transactions[i];
         const char *title = "**Undefined**";
         if (!item["Transaction Description"].empty())
         {

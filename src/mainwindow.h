@@ -9,6 +9,7 @@
 #include "newbill.h"
 #include <QListWidgetItem>
 #include <QTableWidget>
+#include "statement.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,6 +29,7 @@ private:
     importStatement newStatement;
     myStatements myStatementsWindow;
     newbill newbillWindow;
+    
     database* db = database::instance();
     std::string selectedStateament;
     debug *dbg = new debug(true, 2);
