@@ -58,7 +58,7 @@ void database::loadSavedState(){
 };
 
 void database::addStatement(Json::Value data, std::string name){
-    this->state[name] = data;
+    this->state["statements"][name] = data;
 };
 
 std::string database::getStateAsString(){
@@ -67,7 +67,7 @@ std::string database::getStateAsString(){
 
 Statement database::getStatement(std::string statementName){
     dbg->out("Getting statement data");
-    Json::Value statementData = this->state[statementName];
+    Json::Value statementData = this->state["statements"][statementName];
     return Statement(statementData);
 };
 

@@ -19,7 +19,8 @@ myStatements::myStatements(QWidget *parent) :
 
 void myStatements::updateList(){
 	database *db = database::instance();
-    Json::Value statements = db->getState();
+    Json::Value state = db->getState();
+    Json::Value statements = state["statements"];
     QListWidget *list = ui->statemenntList;
     list->clear();
     for (auto const& id : statements.getMemberNames()) {
