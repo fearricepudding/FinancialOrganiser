@@ -29,14 +29,15 @@ private:
     importStatement newStatement;
     myStatements myStatementsWindow;
     newbill newbillWindow;
-    
-    database* db = database::instance();
+    Statement currentStatement;
     std::string selectedStateament;
+
+    database* db = database::instance();
     debug *dbg = new debug(true, 2);
     void createTableRow(QTableWidget *&table, const char*, const char*, int position);
     void createTableRow(QTableWidget *&talbe, const char*, const char*, int position, QBrush background);
     void setupTable(QTableWidget *&, QStringList &);
-    void updateStatementItems(std::string statementName);
+    void updateStatementItems();
     float totalBills;
     Json::Value bills;
 

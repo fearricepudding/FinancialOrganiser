@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1058</width>
+    <width>1203</width>
     <height>978</height>
    </rect>
   </property>
@@ -20,10 +20,10 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="newStatement">
@@ -61,47 +61,19 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="2">
-       <widget class="QTableWidget" name="billsTable">
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectRows</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item>
        <widget class="QTableWidget" name="statementTable">
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QTableWidget" name="statementTotals">
-          <property name="selectionBehavior">
-           <enum>QAbstractItemView::SelectRows</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTableWidget" name="tableWidget_2">
-          <property name="selectionBehavior">
-           <enum>QAbstractItemView::SelectRows</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="2">
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="newbillButton">
-          <property name="text">
-           <string>Add Bill</string>
-          </property>
-         </widget>
-        </item>
         <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
@@ -116,9 +88,59 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="newbillButton">
+          <property name="text">
+           <string>Add Bill</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_2">
           <property name="text">
            <string>Remove Bill</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="billsTable">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTableWidget" name="statementTotals">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tableWidget_2">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QPushButton" name="pushButton_3">
+          <property name="text">
+           <string>New Group</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_4">
+          <property name="text">
+           <string>Edit Group</string>
           </property>
          </widget>
         </item>
@@ -133,8 +155,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1058</width>
-     <height>20</height>
+     <width>1203</width>
+     <height>30</height>
     </rect>
    </property>
   </widget>

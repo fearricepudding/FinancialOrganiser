@@ -16,6 +16,7 @@ public:
     int getTotal();
     void save();
     Json::Value addReccuringTransactions();
+    bool hasTransaction(std::string id);
 
 private:
     Json::Value data;

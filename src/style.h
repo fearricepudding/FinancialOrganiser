@@ -4,3 +4,4 @@ const QBrush Ctransparent   = QColor(0, 0, 0, 0);
 
 const QBrush CMonIn         = QColor(100, 100,  0, 127);
 const QBrush CMonOut        = QColor(0, 100,  100, 127);
+const QBrush CMonBill       = QColor(200, 100, 50, 127);

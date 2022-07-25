@@ -44,12 +44,15 @@ void MainWindow::changedStatement(std::string name)
 {
     dbg->out("New statement selected: " + name);
     selectedStateament = name;
-    updateStatementItems(selectedStateament);
-    
+    currentStatement = db->getStatement(selectedStateament);
+    updateStatementItems();
+    refreshBills();
 }
 
 void MainWindow::setupTable(QTableWidget *&table, QStringList &titles)
 {
+    table->clear();
+    table->setRowCount(0);
     table->setColumnCount(titles.size());
     table->setHorizontalHeaderLabels(titles);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -70,16 +73,15 @@ void MainWindow::createTableRow(QTableWidget *&table, const char *key, const cha
     keyCell->setBackground(background);
     valueCell->setBackground(background);
     int rows = table->rowCount();
-    table->setRowCount(rows+1);
+    table->setRowCount(rows+1);    
     table->setItem(position, 0, keyCell);
     table->setItem(position, 1, valueCell);
 };
 
-void MainWindow::updateStatementItems(std::string statementName)
+void MainWindow::updateStatementItems()
 {
     dbg->out("Updating statement items...");
-    Statement statement = db->getStatement(statementName);
-    Json::Value transactions = statement.getTransactions();
+    Json::Value transactions = currentStatement.getTransactions();
 
     if (transactions.size() <= 0)
     {
@@ -134,7 +136,11 @@ void MainWindow::updateStatementItems(std::string statementName)
                     dbg->err("Failed to STOF debit");
                 }
                 std::string debitString = "-" + debit;
-                this->createTableRow(statementTable, title, debitString.c_str(), i, CMonOut);
+                if(isBill){
+                    this->createTableRow(statementTable, title, debitString.c_str(), i, CMonBill);
+                }else{
+                    this->createTableRow(statementTable, title, debitString.c_str(), i, CMonOut);
+                }
             };
         };
 
@@ -162,11 +168,12 @@ void MainWindow::updateStatementItems(std::string statementName)
     this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
     this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
     this->createTableRow(totalsTable, "Bills total", std::to_string(this->totalBills).c_str(), 2);
+    this->createTableRow(totalsTable, "After Bills", std::to_string(totalIn-this->totalBills).c_str(), 3);
     QBrush balanceBackground = Ctransparent;
     if(monthBalance < 0){
         balanceBackground = Cred;
     };
-    this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 3, balanceBackground);
+    this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 4, balanceBackground);
     
 };
 
@@ -184,10 +191,23 @@ void MainWindow::refreshBills(){
     titles << "Reference"
         << "Ammount";
     setupTable(table, titles);
-    int itt = 0;
-    for (std::string item : this->bills.getMemberNames()) {
+    bool hasTansactions = false;
+    if(currentStatement.getTransactions().size() > 0){
+        dbg->out("currentStatement has transactions");
+        hasTansactions = true;
+    }
+    for (int i = 0; i < this->bills.getMemberNames().size(); i++){
+        std::string item = this->bills.getMemberNames()[i];
         std::string value = this->bills[item].asString();
-        this->createTableRow(table, item.c_str(), value.c_str(), itt);
+        if(hasTansactions){
+            if(currentStatement.hasTransaction(item)){
+                this->createTableRow(table, item.c_str(), value.c_str(), i, Cgreen);   
+            }else{
+                this->createTableRow(table, item.c_str(), value.c_str(), i, Cred);
+            }
+        }else{
+            this->createTableRow(table, item.c_str(), value.c_str(), i);
+        }
         try {
             float valueF = std::stof(value);
             this->totalBills += valueF;
@@ -195,6 +215,5 @@ void MainWindow::refreshBills(){
         catch (const std::invalid_argument& ia) {
             dbg->err("Invalid argument");
         }
-        itt++;
     }
 }

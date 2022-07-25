@@ -21,3 +21,19 @@ Json::Value Statement::addReccuringTransactions(){
     // }
     return reccuringTransactions;
 }
+
+bool Statement::hasTransaction(std::string id){
+    bool found = false;
+    for (int i = 0; i < this->data.size(); i++){
+        Json::Value item = this->data[i];
+        if (!item["Transaction Description"].empty()){
+            if(item["Transaction Description"].asCString() == id){
+                found = true;
+            }
+        }
+        if(found){
+            return true;
+        };
+    };
+    return false;
+};
