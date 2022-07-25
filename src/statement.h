@@ -13,6 +13,9 @@ public:
     Statement(Json::Value data);
 
     Json::Value getTransactions();
+    int getTotal();
+    void save();
+    Json::Value addReccuringTransactions();
 
 private:
     Json::Value data;

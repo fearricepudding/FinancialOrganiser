@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void updateStatementItems(std::string statementName);
+    
 
 private:
     Ui::MainWindow *ui;
@@ -36,6 +36,7 @@ private:
     void createTableRow(QTableWidget *&table, const char*, const char*, int position);
     void createTableRow(QTableWidget *&talbe, const char*, const char*, int position, QBrush background);
     void setupTable(QTableWidget *&, QStringList &);
+    void updateStatementItems(std::string statementName);
     float totalBills;
     Json::Value bills;
 

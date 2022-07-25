@@ -75,6 +75,20 @@ Json::Value database::getState(){
     return  this->state;
 };
 
+Json::Value database::getAllStatements(){
+    return this->state["statements"];
+};
+
+Json::Value database::getStatementNames(){
+    Json::Value statements = this->state["statements"];
+    Json::Value names;
+    for(int i = 0; i < statements.size(); i++){
+        std::string name = statements.getMemberNames()[i];
+        names[i] = name;
+    }
+    return names;
+};
+
 Json::Value database::getBills() {
     Json::Value bills = this->state["bills"];
     return bills;
@@ -82,6 +96,7 @@ Json::Value database::getBills() {
 
 void database::addBills(Json::Value bills) {
     Json::Value current = this->getBills();
+    std::cout << current << std::endl;
     for(std::string bill : bills.getMemberNames()){
         std::string value = bills[bill].asString();
         current[bill] = value;

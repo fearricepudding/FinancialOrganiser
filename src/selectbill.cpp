@@ -58,6 +58,7 @@ void selectbill::newBills() {
     int itt = 0;
     for (QTableWidgetItem *item : selected) {
         std::string text = item->text().toStdString();
+        std::cout << text << std::endl;
         if (itt % 2 == 0) {
             desc = text;
         } else {

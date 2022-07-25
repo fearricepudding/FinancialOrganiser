@@ -28,6 +28,8 @@ public:
     Statement getStatement(std::string statementName);
 	void addBills(Json::Value);
 	Json::Value getBills();
+	Json::Value getAllStatements();
+	Json::Value getStatementNames();
 
 private:
     debug *dbg = new debug(true, 2);

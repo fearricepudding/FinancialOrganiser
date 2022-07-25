@@ -4,6 +4,7 @@
 #include "importstatement.h"
 #include "database.h"
 #include "mystatements.h"
+#include "style.h"
 
 #include <QTableWidget>
 
@@ -44,6 +45,7 @@ void MainWindow::changedStatement(std::string name)
     dbg->out("New statement selected: " + name);
     selectedStateament = name;
     updateStatementItems(selectedStateament);
+    
 }
 
 void MainWindow::setupTable(QTableWidget *&table, QStringList &titles)
@@ -56,19 +58,21 @@ void MainWindow::setupTable(QTableWidget *&table, QStringList &titles)
 
 void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position)
 {
+    QBrush defaultColour = Ctransparent;
+    createTableRow(table, key, value, position, defaultColour);
+};
+
+void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position, QBrush background){
     QTableWidgetItem *keyCell = new QTableWidgetItem();
     QTableWidgetItem *valueCell = new QTableWidgetItem();
     keyCell->setText(QString::fromUtf8(key));
     valueCell->setText(QString::fromUtf8(value));
+    keyCell->setBackground(background);
+    valueCell->setBackground(background);
     int rows = table->rowCount();
     table->setRowCount(rows+1);
     table->setItem(position, 0, keyCell);
     table->setItem(position, 1, valueCell);
-};
-
-void MainWindow::createTableRow(QTableWidget *&table, const char *key, const char *value, int position, QBrush background){
-    createTableRow(table, key, value, position);
-    table->itemAt(position, 1)->setBackground(Qt::cyan);
 };
 
 void MainWindow::updateStatementItems(std::string statementName)
@@ -130,7 +134,7 @@ void MainWindow::updateStatementItems(std::string statementName)
                     dbg->err("Failed to STOF debit");
                 }
                 std::string debitString = "-" + debit;
-                this->createTableRow(statementTable, title, debitString.c_str(), i);
+                this->createTableRow(statementTable, title, debitString.c_str(), i, CMonOut);
             };
         };
 
@@ -149,7 +153,7 @@ void MainWindow::updateStatementItems(std::string statementName)
                 {
                     dbg->err("Failed to STOF credit");
                 };
-                this->createTableRow(statementTable, title, credit.c_str(), i);
+                this->createTableRow(statementTable, title, credit.c_str(), i, CMonIn);
             };
         };
     };
@@ -157,8 +161,13 @@ void MainWindow::updateStatementItems(std::string statementName)
 
     this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
     this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
-    this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 2);
-    this->createTableRow(totalsTable, "Bills total", std::to_string(this->totalBills).c_str(), 3);
+    this->createTableRow(totalsTable, "Bills total", std::to_string(this->totalBills).c_str(), 2);
+    QBrush balanceBackground = Ctransparent;
+    if(monthBalance < 0){
+        balanceBackground = Cred;
+    };
+    this->createTableRow(totalsTable, "Balance for statement", std::to_string(monthBalance).c_str(), 3, balanceBackground);
+    
 };
 
 void MainWindow::openStatementImporter()
@@ -174,11 +183,7 @@ void MainWindow::refreshBills(){
     QStringList titles;
     titles << "Reference"
         << "Ammount";
-    table->setColumnCount(2);
-    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    table->setHorizontalHeaderLabels(titles);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->setRowCount(this->bills.size());
+    setupTable(table, titles);
     int itt = 0;
     for (std::string item : this->bills.getMemberNames()) {
         std::string value = this->bills[item].asString();

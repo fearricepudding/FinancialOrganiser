@@ -71,7 +71,10 @@ void newbill::autoCompare() {
                 if (check.size() > 0) {
                     //std::cout << transID << std::endl;
                     if (check.isMember(transID)) {
-                        if (check[transID].asFloat() == amount || (check[transID].asFloat() > amount-matchPrecision && check[transID].asFloat() < amount+matchPrecision)) {
+                        if (check[transID].asFloat() == amount 
+                            || (check[transID].asFloat() > amount-matchPrecision 
+                                || check[transID].asFloat() < amount+matchPrecision)
+                            ) {
                             track[transID] = amount;
                         }
                     }
@@ -132,10 +135,11 @@ void newbill::removeStatement() {
 void newbill::populate() {
     dbg->out("Populating newbill");
     database* db = database::instance();
-    Json::Value statements = db->getState();
+    Json::Value statements = db->getStatementNames();
     this->availableStatements->clear();
     this->selectedStatements->clear();
-    for (auto const& id : statements.getMemberNames()) {
+    for (int i = 0; i < statements.size(); i++) {
+        std::string id = statements[i].asString();
         this->availableStatements->addItem(QString::fromStdString(id));
     };
 }
