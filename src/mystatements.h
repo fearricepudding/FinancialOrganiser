@@ -20,6 +20,7 @@ public:
 
 private:
     Ui::myStatements *ui;
+    void cancel();
 
 private slots:
     void selectedSlot();

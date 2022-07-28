@@ -10,6 +10,8 @@
 #include <QListWidgetItem>
 #include <QTableWidget>
 #include "statement.h"
+#include "bill.h"
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,7 +41,7 @@ private:
     void setupTable(QTableWidget *&, QStringList &);
     void updateStatementItems();
     float totalBills;
-    Json::Value bills;
+    std::vector<Bill> bills;
 
 public slots:
     void refreshBills();

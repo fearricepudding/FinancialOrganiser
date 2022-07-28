@@ -21,6 +21,11 @@ public:
         if(this->_verbosity >= 0 && this->_enable)
             std::cout << "[DEBUG] " << o << std::endl;
     }
+    template <typename T>
+    void out(std::string label, T o){
+        if(this->_verbosity >= 0 && this->_enable)
+            std::cout << "[DEBUG] [" << label << "] "  << o << std::endl;
+    }
 
     template <typename T>
     void warn(T o){

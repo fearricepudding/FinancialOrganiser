@@ -89,17 +89,24 @@ Json::Value database::getStatementNames(){
     return names;
 };
 
-Json::Value database::getBills() {
-    Json::Value bills = this->state["bills"];
+std::vector<Bill> database::getBills() {
+    dbg->out("Get bills");
+    Json::Value billsObj = this->state["bills"];
+    std::vector<Bill> bills;
+    for(std::string reference : billsObj.getMemberNames()){
+        Json::Value billData = billsObj[reference];
+        bills.push_back(Bill(billData));
+    }
+    dbg->out("get bills size", sizeof(bills));
     return bills;
 }
 
-void database::addBills(Json::Value bills) {
-    Json::Value current = this->getBills();
-    std::cout << current << std::endl;
-    for(std::string bill : bills.getMemberNames()){
-        std::string value = bills[bill].asString();
-        current[bill] = value;
+void database::addBills(std::vector<Bill> bills) {
+    Json::Value current = this->state["bills"];
+    for(int i = 0; i < bills.size(); i++){
+        Bill bill = bills.at(i);
+        Json::Value billData = bill.getState();
+        current[billData["reference"].asString()] = billData;
     }
     this->state["bills"] = current;
     this->save();

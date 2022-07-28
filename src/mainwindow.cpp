@@ -115,7 +115,7 @@ void MainWindow::updateStatementItems()
         if (!item["Transaction Description"].empty())
         {
             title = item["Transaction Description"].asCString();
-            if(this->bills.isMember(title)){
+            if(Bill::checkForReference(&this->bills, title)){
                 isBill = true;
             };
         }
@@ -163,7 +163,7 @@ void MainWindow::updateStatementItems()
             };
         };
     };
-    dbg->out("Setting totals...");
+dbg->out("Setting totals...");
 
     this->createTableRow(totalsTable, "Total Out", std::to_string(monthTotal).c_str(), 0);
     this->createTableRow(totalsTable, "Total In", std::to_string(totalIn).c_str(), 1);
@@ -186,19 +186,26 @@ void MainWindow::refreshBills(){
     dbg->out("Refresh bills");
     QTableWidget *table = ui->billsTable;
     table->clear();
-    this->bills = db->getBills();
+    std::vector<Bill> bills = db->getBills();
+    this->bills = bills;
     QStringList titles;
     titles << "Reference"
         << "Ammount";
     setupTable(table, titles);
+
     bool hasTansactions = false;
     if(currentStatement.getTransactions().size() > 0){
         dbg->out("currentStatement has transactions");
         hasTansactions = true;
     }
-    for (int i = 0; i < this->bills.getMemberNames().size(); i++){
-        std::string item = this->bills.getMemberNames()[i];
-        std::string value = this->bills[item].asString();
+    dbg->out(hasTansactions);
+    dbg->out("refresh bills size", bills.size());
+    for (int i = 0; i < bills.size(); i++){
+        Bill bill = bills.at(i);
+        std::string item = bill.getReference();
+        std::string value = bill.getTotal();
+        dbg->out(item);
+        dbg->out(value);
         if(hasTansactions){
             if(currentStatement.hasTransaction(item)){
                 this->createTableRow(table, item.c_str(), value.c_str(), i, Cgreen);   

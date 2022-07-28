@@ -8,16 +8,20 @@
 class Bill{
 public:
     Bill();
-    Bill(std::string, float);
-    Bill(std::string, float, std::string);
-    Bill(std::string, float, std::string, int);
+    Bill(std::string, std::string);
+    Bill(std::string, std::string, std::string);
+    Bill(std::string, std::string, std::string, int);
+    Bill(Json::Value);
     void setLabel(std::string);
     std::string getLabel();
+    void setReference(std::string);
+    std::string getReference();
+    void setTotal(int);
+    std::string getTotal();
+    static bool checkForReference(std::vector<Bill>*, std::string);
+    Json::Value getState();
 private:
-    float total;
-    std::string label;
-    std::string reference;
-    int occurances;
+    Json::Value data;
 };
 
 #endif

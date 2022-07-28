@@ -12,10 +12,12 @@
 #include <algorithm>
 #include <string> 
 #include <sstream>
+#include <vector>
 
 #include "debug.h"
 #include "helpers.h"
 #include "statement.h"
+#include "bill.h"
 
 class database{
 public:
@@ -26,8 +28,8 @@ public:
 	void addStatement(Json::Value data, std::string name);
 	std::string getStateAsString();
     Statement getStatement(std::string statementName);
-	void addBills(Json::Value);
-	Json::Value getBills();
+	void addBills(std::vector<Bill>);
+	std::vector<Bill> getBills();
 	Json::Value getAllStatements();
 	Json::Value getStatementNames();
 

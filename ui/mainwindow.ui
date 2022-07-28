@@ -52,13 +52,6 @@
           </property>
          </spacer>
         </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Remove Statement</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item>
@@ -75,6 +68,20 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
+         <widget class="QPushButton" name="newbillButton">
+          <property name="text">
+           <string>Add Bill</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="editBillButton">
+          <property name="text">
+           <string>Edit Bill</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -86,20 +93,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="newbillButton">
-          <property name="text">
-           <string>Add Bill</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="text">
-           <string>Remove Bill</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>
@@ -131,14 +124,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="newGroupButton">
           <property name="text">
            <string>New Group</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="editGroupButton">
           <property name="text">
            <string>Edit Group</string>
           </property>

@@ -12,7 +12,8 @@ myStatements::myStatements(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->statemenntList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(statementClicked(QListWidgetItem*)));
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &myStatements::selectedSlot);
+    connect(ui->open, &QPushButton::released, this, &myStatements::selectedSlot);
+    connect(ui->cancel, &QPushButton::released, this, &myStatements::cancel);
 
     updateList();
 }
@@ -34,6 +35,11 @@ myStatements::~myStatements(){
 
 void myStatements::selectedSlot(){
     emit newStatement(currentStatement);
+    cancel();
+}
+
+void myStatements::cancel(){
+    this->destroy();
 }
 
 void myStatements::statementClicked(QListWidgetItem *item){

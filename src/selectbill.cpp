@@ -52,19 +52,19 @@ void selectbill::addBillRow(QString id, QString price, int position) {
 
 void selectbill::newBills() {
     QList<QTableWidgetItem*> selected = ui->billList->selectedItems();
-    std::string desc;
-    std::string value;
-    Json::Value bills;
+    std::vector<Bill> bills;
     int itt = 0;
+    std::string reference;
+    std::string total;
     for (QTableWidgetItem *item : selected) {
         std::string text = item->text().toStdString();
-        std::cout << text << std::endl;
         if (itt % 2 == 0) {
-            desc = text;
+            reference = text;
         } else {
-            value = text;
-        }
-        bills[desc] = value;
+            total = text;
+            Bill newBill = Bill(reference, total);
+            bills.push_back(newBill);
+        };
         itt++;
     }
     database* db = database::instance();
