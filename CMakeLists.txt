@@ -39,6 +39,7 @@ add_executable(FinancialOrganiser
   src/selectbill.cpp
   src/statement.cpp
   src/helpers.cpp
+  src/bill.cpp
 
   src/mainwindow.h
   src/importstatement.h
@@ -50,6 +51,8 @@ add_executable(FinancialOrganiser
   src/selectbill.h
   src/statement.h
   src/helpers.h
+  src/style.h
+  src/bill.h
 )
 
 target_link_libraries(FinancialOrganiser PRIVATE  jsoncpp_lib jsoncpp_object Qt5::Widgets)
