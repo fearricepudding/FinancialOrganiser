@@ -24,7 +24,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    
 
 private:
     Ui::MainWindow *ui;
@@ -51,6 +50,8 @@ private slots:
    // void statementItemClicked(QListWidgetItem *item);
     void openStatements();
     void openNewbill();
+    void newGroup();
+    void editGroup();
     void changedStatement(std::string name);
 };
 #endif // MAINWINDOW_H

@@ -17,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(&newbillWindow, SIGNAL(refreshBills()), this, SLOT(refreshBills()));
     connect(ui->openStatements, &QPushButton::released, this, &MainWindow::openStatements);
     connect(ui->newbillButton, &QPushButton::released, this, &MainWindow::openNewbill);
+
+    connect(ui->newGroupButton, &QPushButton::released, this, &MainWindow::newGroup);
+    connect(ui->editGroupButton, &QPushButton::released, this, &MainWindow::editGroup);
     totalBills = 0.f;
     this->refreshBills();
 }
@@ -25,6 +28,14 @@ MainWindow::~MainWindow()
 {
     delete ui;
     this->destroy();
+}
+
+void MainWindow::newGroup(){
+
+}
+
+void MainWindow::editGroup(){
+    
 }
 
 void MainWindow::openNewbill() {
@@ -220,7 +231,7 @@ void MainWindow::refreshBills(){
             this->totalBills += valueF;
         }
         catch (const std::invalid_argument& ia) {
-            dbg->err("Invalid argument");
+            dbg->err("Failed to STOF bill");
         }
     }
 }
